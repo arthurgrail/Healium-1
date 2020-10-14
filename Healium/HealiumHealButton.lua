@@ -23,11 +23,6 @@ function Healium_HealButton_OnEnter(frame, motion)
     if frame.id and (stype == "spell") then 
 		GameTooltip_SetDefaultAnchor(GameTooltip, frame)	
 		GameTooltip:SetSpellBookItem(frame.id, SpellBookFrame.bookType)
-		local Profile = Healium_GetProfile()
-		local rank = Profile.SpellRanks[frame.index]
-		if rank then 
-			GameTooltip:AddLine(Healium_AddonColor .. rank .. "|r",1,1,1)
-		end
 		local unit = frame:GetParent().TargetUnit
 		if not UnitExists(unit) then return end
 		local Name = UnitName(unit)
@@ -124,7 +119,7 @@ local function Drag(frame)
 
 	local Profile = Healium_GetProfile()
 	local infoType, info1, info2, info3 = GetCursorInfo()
-	Healium_DebugPrint("infoType:", infoType, "info1:", info1, "info2:", info2, "info3:", info3 )
+		Healium_DebugPrint("infoType:", infoType, "info1:", info1, "info2:", info2, "info3:", info3 )
 	local old = GetOldSpell(frame.index, Profile)
 	
 	local spellName
@@ -144,13 +139,14 @@ local function Drag(frame)
 				return
 			end
 		end
+		
+		
 
 		-- GetSpellInfo() is returning nil for everything for Holy Word: Chastise and any of it's transformed variations
 		local icon = GetSpellTexture(spellName)
-		local subtext = GetSpellSubtext(info3)
-		local rankedSpellName = Healium_MakeRankedSpellName(spellName, subtext)
-		Healium_DebugPrint("name:", spellName, "subtext:", subtext, "rankedSpellName:", rankedSpellName, "icon:", icon)
-		Healium_SetProfileSpell(Profile, frame.index, spellName, info1, icon, subtext)
+		--local name, rank, icon = GetSpellInfo(info1)
+		Healium_DebugPrint("name:", spellName, "rank:", rank, "icon:", icon)
+		Healium_SetProfileSpell(Profile, frame.index, spellName, info1, icon)
 		FinishDrag(frame, old)
 		return
 	end

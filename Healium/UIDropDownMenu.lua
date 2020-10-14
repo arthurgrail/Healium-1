@@ -18,19 +18,13 @@ LIB_UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT = nil;
 -- List of open menus
 LIB_OPEN_DROPDOWNMENUS = {}; --used by UnitPopup only
 
-local Lib_UIDropDownMenuDelegate = CreateFrame("Frame");
+local Lib_UIDropDownMenuDelegate = CreateFrame("FRAME");
 for i = 1, LIB_UIDROPDOWNMENU_MAXLEVELS do
 	local listFrameName = "Lib_DropDownList"..i;	
-	local f = CreateFrame("Button", listFrameName, Lib_UIDropDownMenuDelegate, "Lib_UIDropDownListTemplate");
+	local f = CreateFrame("Button", listFrameName, nil, "Lib_UIDropDownListTemplate");
 	f:SetID(i);
 	f:SetSize(180, 10);
 	f:SetFrameStrata("FULLSCREEN_DIALOG");
-	-- Joe's added junk here
-	--  removed these from the template xml
-	--f:SetBackdropBorderColor(0, 0, 0);
-	--f:SetBackdropColor(0,0,0);
-
-	--
 	local fontName, fontHeight, fontFlags = _G["Lib_DropDownList1Button1NormalText"]:GetFont();
 	LIB_UIDROPDOWNMENU_DEFAULT_TEXT_HEIGHT = fontHeight;
 	for j = 1, LIB_UIDROPDOWNMENU_MAXBUTTONS do

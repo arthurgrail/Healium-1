@@ -1,7 +1,5 @@
 -- Unit Frames Code
 
-local IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
-
 local PartyFrame = nil
 local PetsFrame = nil
 local MeFrame = nil
@@ -36,35 +34,29 @@ local DebuffSoundPath
 
 -- locale safe versions of spell names
 local RejuvenationGermination = GetSpellInfo(155777) -- Rejuvenation (Germination) is a buff when a druid with the Germination talent casts Rejuvenation on a target
-local EternalFlame = GetSpellInfo(156322) -- Eternal Flame is a buff when a paladin with the Eternal Flame talent casts Word of Glory on a target
 local Atonement = GetSpellInfo(81749) -- Atonement: Plea, Power Word: Shield, Shadow Mend, and Power Word: Radiance also apply Atonement to your target for 15 sec.
+local Tranquility = GetSpellInfo(157982) -- Tranquility now has a HoT component in BfA
+local Glimmer = GetSpellInfo(287280) -- Glimmer of Light, Holy Paladin Azerite trait
 
--- sounds ids from https://wow.tools/files/#search=&page=1&sort=0&desc=asc
 Healium_Sounds = {
-	{ ["Alliance Bell"] = { fileid = 566564, path = "Sound\\Doodad\\BellTollAlliance.ogg"}},
-	{ ["Bellow"] = { fileid = 566234, path = "Sound\\Doodad\\BellowIn.ogg" }},
-	{ ["Dwarf Horn"] = {fileid = 566064, path = "Sound\\Doodad\\DwarfHorn.ogg" }},
-	{ ["Gruntling Horn A"] = {retail = 1, fileid = 598076, path = "Sound\\Events\\gruntling_horn_aa.ogg" }},
-	{ ["Gruntling Horn B"] = {retail = 1, fileid = 598196, path = "Sound\\Events\\gruntling_horn_bb.ogg" }},
-	{ ["Horde Bell"] = { fileid = 565853, path = "Sound\\Doodad\\BellTollHorde.ogg" }},
-	{ ["Man Scream"] = { retail = 1, fileid = 598052, path = "Sound\\Events\\EbonHold_ManScream1_02.ogg" }},
-	{ ["Night Elf Bell"] = { fileid = 566558, path = "Sound\\Doodad\\BellTollNightElf.ogg" }},
-	{ ["Space Death"] = { retail = 1, fileid = 567198, path = "Sound\\Effects\\DeathImpacts\\SpaceDeathUni.ogg" }},
-	{ ["Tribal Bell"] = { fileid = 566027, path = "Sound\\Doodad\\BellTollTribal.ogg" }},
-	{ ["Wisp"] = { fileid = 567294, path = "Sound\\Event Sounds\\Wisp\\WispPissed2.ogg" }},
-	{ ["Woman Scream"] = { retail = 1, fileid = 598223, path = "Sound\\Events\\EbonHold_WomanScream1_02.ogg" }}
+	{ ["Alliance Bell"] = 566564 },
+	{ ["Bellow"] = 566234 },
+	{ ["Dwarf Horn"] = 566064 },
+	{ ["Gruntling Horn A"] = 598076 },
+	{ ["Gruntling Horn B"] = 598196 },
+	{ ["Horde Bell"] = 565853 },
+	{ ["Man Scream"] = 598052 },
+	{ ["Night Elf Bell"] = 566558 },
+	{ ["Space Death"] = 567198 },
+	{ ["Tribal Bell"] = 566027 },
+	{ ["Wisp"] = 567294 },
+	{ ["Woman Scream"] = 598223 },
 }
-
-
 
 function Healium_GetSoundPath(sound)
 	for i,j in ipairs(Healium_Sounds) do
 		if sound == next(j, nil) then
-			if IsClassic then 
-				return j[sound].path
-			else
-				return j[sound].fileid
-			end
+			return j[sound]
 		end
 	end
 	
@@ -81,7 +73,7 @@ function Healium_InitDebuffSound()
 end
 
 function Healium_PlayDebuffSound()
-	Healium_DebugPrint("playing sound " .. DebuffSoundPath)
+--	Healium_Warn("playing sound " .. DebuffSoundPath)
 	PlaySoundFile(DebuffSoundPath)	
 end
 
@@ -415,7 +407,7 @@ function HealiumUnitFrames_ShowHideFrame(frame, show)
 		return
 	end
 	
-	if (not IsClassic) and (frame == FocusFrame) then
+	if frame == FocusFrame then
 		Healium_DebugPrint("ShowHide Focus Frame")
 		Healium.ShowFocusFrame = show
 		Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
@@ -499,10 +491,18 @@ end
 
 
 function HealiumUnitFrames_Button_OnShow(frame)
+	if frame:GetName() == "HealiumPartyFrame_HeaderUnitButton1" then
+		--print(debugstack())
+	end
+	--print("showing "..frame:GetName())
 	table.insert(Healium_ShownFrames, frame)
 end	
 
 function HealiumUnitFrames_Button_OnHide(frame)
+	if frame:GetName() == "HealiumPartyFrame_HeaderUnitButton1" then
+		--print(debugstack())
+	end
+	--print("hiding "..frame:GetName())
 	Healium_ShownFrames[frame] = nil
 	
 	local parent = frame:GetParent()
@@ -559,11 +559,6 @@ function HealiumUnitFrames_Button_OnAttributeChanged(frame, name, value)
 			Healium_UpdateUnitRole(newUnit, frame)
 			Healium_UpdateSpecialBuffs(newUnit)
 			Healium_UpdateRaidTargetIcon(frame)
-
-			if not Healium.ShowIncomingHeals then
-				frame.PredictBar:Hide()
-			end
-
 		end
 		
 		if oldUnit then
@@ -624,7 +619,7 @@ function Healium_ToggleAllFrames()
 		Healium_Warn("Can't toggle frames while in combat.")
 		return
 	end
-	
+		
 	local hide = false
 
 	if PartyFrame:IsShown() then hide = true end
@@ -635,10 +630,7 @@ function Healium_ToggleAllFrames()
 	if HealersFrame:IsShown() then hide = true end
 	if TanksFrame:IsShown() then hide = true end
 	if TargetFrame:IsShown() then hide = true end
-	
-	if not IsClassic then 
-		if FocusFrame:IsShown() then hide = true end
-	end
+	if FocusFrame:IsShown() then hide = true end
 
 	for i,j in ipairs(GroupFrames) do
 		if j:IsShown() then
@@ -656,10 +648,7 @@ function Healium_ToggleAllFrames()
 		HealersFrameWasShown = HealersFrame:IsShown() 
 		TanksFrameWasShown = TanksFrame:IsShown()
 		TargetFrameWasShown = TargetFrame:IsShown()
-		
-		if not IsClassic then 
-			FocusFrameWasShown = FocusFrame:IsShown()
-		end
+		FocusFrameWasShown = FocusFrame:IsShown()
 	
 		PartyFrame:Hide()
 		PetsFrame:Hide()
@@ -669,10 +658,7 @@ function Healium_ToggleAllFrames()
 		HealersFrame:Hide()
 		TanksFrame:Hide()
 		TargetFrame:Hide()
-		
-		if not IsClassic then 
-			FocusFrame:Hide()
-		end
+		FocusFrame:Hide()
 		
 		for i,j in ipairs(GroupFrames) do
 			GroupFramesWasShown[i] = j:IsShown()
@@ -693,10 +679,7 @@ function Healium_ToggleAllFrames()
 	if HealersFrameWasShown then HealersFrame:Show() end
 	if TanksFrameWasShown then TanksFrame:Show() end
 	if TargetFrameWasShown then TargetFrame:Show() end
-	
-	if not IsClassic then 
-		if FocusFrameWasShown then FocusFrame:Show() end
-	end
+	if FocusFrameWasShown then FocusFrame:Show() end
 	
 	for i,j in ipairs(GroupFramesWasShown) do
 		if j then
@@ -803,7 +786,6 @@ function Healium_ShowHideTargetFrame(show)
 end
 
 function Healium_ShowHideFocusFrame(show)
-	if IsClassic then return end
 	if InCombatLockdown() then return end
 	if (show ~= nil) then Healium.ShowFocusFrame = show end
 	
@@ -859,17 +841,50 @@ function Healium_Show40ManRaidFrames()
 end
 
 function Healium_CreateUnitFrames()
-	PartyFrame = CreatePartyUnitFrame("HealiumPartyFrame", "Party")
-	PetsFrame = CreatePetUnitFrame("HealiumPetFrame", "Pets")
-	MeFrame = CreateMeUnitFrame("HealiumMeFrame", "Me")
-	FriendsFrame = CreateFriendsUnitFrame("HealiumFriendsFrame", "Friends")
-	DamagersFrame = CreateDamagersUnitFrame("HealiumDamagersFrame", "Damagers")
-	HealersFrame = CreateHealersUnitFrame("HealiumHealersFrame", "Healers")
-	TanksFrame = CreateTanksUnitFrame("HealiumTanksFrame", "Tanks")
-	TargetFrame = CreateTargetUnitFrame("HealiumTargetFrame", "Target")
 	
-	if not IsClassic then 
-		FocusFrame = CreateFocusUnitFrame("HealiumFocusFrame", "Focus")
+	PartyFrame = CreatePartyUnitFrame("HealiumPartyFrame", "Party")
+	if Healium.ShowPartyFrame then
+		PartyFrame:Show()
+	end
+	
+	PetsFrame = CreatePetUnitFrame("HealiumPetFrame", "Pets")
+	if Healium.ShowPetsFrame then
+		PetsFrame:Show()
+	end
+	
+	MeFrame = CreateMeUnitFrame("HealiumMeFrame", "Me")
+	if Healium.ShowMeFrame then
+		MeFrame:Show()
+	end	
+
+	FriendsFrame = CreateFriendsUnitFrame("HealiumFriendsFrame", "Friends")
+	if Healium.ShowFriendsFrame then
+		FriendsFrame:Show()
+	end	
+
+	DamagersFrame = CreateDamagersUnitFrame("HealiumDamagersFrame", "Damagers")
+	if Healium.ShowDamagersFrame then
+		DamagersFrame:Show()
+	end	
+	
+	HealersFrame = CreateHealersUnitFrame("HealiumHealersFrame", "Healers")
+	if Healium.ShowHealersFrame then
+		HealersFrame:Show()
+	end	
+	
+	TanksFrame = CreateTanksUnitFrame("HealiumTanksFrame", "Tanks")
+	if Healium.ShowTanksFrame then
+		TanksFrame:Show()
+	end	
+	
+	TargetFrame = CreateTargetUnitFrame("HealiumTargetFrame", "Target")
+	if Healium.ShowTargetFrame then
+		TargetFrame:Show()
+	end
+	
+	FocusFrame = CreateFocusUnitFrame("HealiumFocusFrame", "Focus")
+	if Healium.ShowFocusFrame then
+		FocusFrame:Show()
 	end
 	
 	for i=1, 8, 1 do
@@ -891,32 +906,13 @@ function Healium_SetScale()
 	HealersFrame:SetScale(Scale)
 	TanksFrame:SetScale(Scale)
 	TargetFrame:SetScale(Scale)
-	
-	if not IsClassic then 
-		FocusFrame:SetScale(Scale)
-	end
+	FocusFrame:SetScale(Scale)
 	
 	for i,j in ipairs(GroupFrames) do
 		j:SetScale(Scale)
 	end	
 end
 
-function Healium_MakeRankedSpellName(spellName, spellSubtext)
-	local rankedSpellName
-	
-	if spellSubtext == "" then
-		spellSubtext = nil
-	end
-		
-	if spellSubtext then
-		rankedSpellName = spellName .. "(" .. spellSubtext .. ")"
-	else
-		rankedSpellName = spellName
-	end
-	
-	return rankedSpellName
-end
-		
 function Healium_UpdateUnitBuffs(unit, frame)
 
 	local buffIndex = 1
@@ -931,7 +927,7 @@ function Healium_UpdateUnitBuffs(unit, frame)
 					local armed = false
 					
 					for j=1, Profile.ButtonCount, 1 do
-						if Profile.SpellNames[j] == name or name == RejuvenationGermination or name == EternalFlame or name == Atonement then
+						if Profile.SpellNames[j] == name or name == RejuvenationGermination or name == Atonement or name == Tranquility or name==Glimmer then
 							armed = true
 							break
 						end
@@ -999,7 +995,8 @@ function Healium_UpdateUnitBuffs(unit, frame)
 					frame.debuffColor = debuffColor
 					
 					if Healium.EnableDebufHealthbarHighlighting then
-						frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
+						-- SetBackdropBorderColor no longer supported by API
+						-- frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 						frame.CurseBar:SetAlpha(1)
 					end	
 					
@@ -1090,6 +1087,5 @@ function Healium_UpdateTargetFrame()
 end
 
 function Healium_UpdateFocusFrame()
-	if IsClassic then return end
 	HealiumUnitFrames_Button_OnAttributeChanged(FocusFrame.hdr, "unit")
 end

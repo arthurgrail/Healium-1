@@ -3,7 +3,7 @@
  xsi:schemaLocation="http://www.blizzard.com/wow/ui/ ..\FrameXML\UI.xsd">
  
 <!-- The main frame template -->	
-	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="true" enableMouse="true">
+	<Frame name="HealiumUnitFrameTemplate" virtual="true" movable="true" parent="UIParent" hidden="false" enableMouse="true">
         <Size>
             <AbsDimension x="120" y="30"/>
         </Size>
