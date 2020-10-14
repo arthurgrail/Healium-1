@@ -1,3 +1,5 @@
+local IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+
 local CanCureMagic = false
 local CanCureDisease = false
 local CanCurePoison = false
@@ -34,6 +36,8 @@ end
 -- These spellIDs are from wowhead
 function Healium_InitSpells(class, race)
 	
+	local CureName
+	
 	-- clear cures
 	Healium_Spell.Name = {}
 	Healium_Spell.Icon = {}
@@ -43,165 +47,299 @@ function Healium_InitSpells(class, race)
 
 	-- Init spell list
 	if (class == "DRUID") then 
-		AddSpell(774)		-- Rejuvenation
-		AddSpell(8936)		-- Regrowth
-		AddSpell(33763)		-- Lifebloom
-		AddSpell(18562)		-- Swiftmend
-		AddSpell(48438)		-- Wild Growth
-		AddSpell(88423)		-- Nature's Cure
-		AddSpell(102342)	-- Ironbark
-		AddSpell(102351)	-- Cenarion Ward
-		AddSpell(2782)		-- Remove Corruption
-		AddSpell(20484)		-- Rebirth (battle rez)
-		AddSpell(50769)		-- Revive (rez)
+	
+		if IsClassic then 
+			-- classic 
+			
+			--Druid Remove Curse, classic version
+			CureName = SpellName(2782) 
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureCurse = true,
+				}
+			end
+			
+			-- Druid Abolish-Poision, classic only
+			CureName = SpellName(2893) 
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true,
+				}
+			end
+			
+			-- Druid Cure Poision, classic only
+			CureName = SpellName(8946) 
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true,
+				}
+			end
 		
-		-- Druid Remove Corruption
-		Cures[SpellName(2782)] = { 
-			CanCurePoison = true, 
-			CanCureCurse = true,
-		}
+		else
+			-- retail
+			AddSpell(774)		-- Rejuvenation
+			AddSpell(8936)		-- Regrowth
+			AddSpell(33763)		-- Lifebloom
+			AddSpell(5185)		-- Healing Touch
+			AddSpell(18562)		-- Swiftmend
+			AddSpell(48438)		-- Wild Growth
+			AddSpell(88423)		-- Nature's Cure
+			AddSpell(102342)	-- Ironbark
+			AddSpell(102351)	-- Cenarion Ward
+			AddSpell(2782)		-- Remove Corruption
+			AddSpell(20484)		-- Rebirth (battle rez)
+			AddSpell(50769)		-- Revive (rez)
+			
+			-- Druid Remove Corruption, retail version.. retail version can cure poision too?
+			CureName = SpellName(2782) 
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true, 
+					CanCureCurse = true,
+				}
+			end
+			
+			-- Druid Nature's Cure		
+			CureName = SpellName(88423)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true, 
+					CanCureCurse = true,
+					CanCureMagic = true,
+				}
+			end			
+		end
 		
-		-- Druid Nature's Cure		
-		Cures[SpellName(88423)] = { 
-			CanCurePoison = true, 
-			CanCureCurse = true,
-			CanCureMagic = true,
-		}
 	end
 
 	if (class == "PRIEST") then 
-		AddSpell(528)		-- Dispel Magic
-		AddSpell(527)		-- Purify		
-		AddSpell(139)		-- Renew
-		AddSpell(2061)		-- Flash Heal
-		AddSpell(2060)		-- Heal
-		AddSpell(32546)		-- Binding Heal
-		AddSpell(596)		-- Prayer of Healing
-		AddSpell(33076)		-- Prayer of Mending
-		AddSpell(200829)	-- Plea
-		AddSpell(186263)	-- Shadow Mend
-		AddSpell(34861)		-- Circle of Healing
-		AddSpell(17)		-- Power Word: Shield
-		AddSpell(152118)	-- Clarity of Will
-		AddSpell(47788)		-- Guardian Spirit
-		AddSpell(47540)		-- Penance
-		AddSpell(2050)     	-- Holy Word: Serenity		
-		AddSpell(121135)	-- Cascade (not sure if correct Cascade)
-		AddSpell(2006)		-- Resurrection (rez)
+	
+		if IsClassic then 
+			-- classic 
+			
+			-- Priest Dispel Magic, classic version
+			CureName = SpellName(527)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureMagic = true 
+				}
+			end			
+			
+			-- Prist Cure Disease, classic version
+			CureName = SpellName(528)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureDisease = true, 
+				}
+			end	
+			
+			-- Priest Abolish Disease, classic only
+			CureName = SpellName(552)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureDisease = true, 
+				}
+			end			
+		
+		else
+			-- retail
+			AddSpell(528)		-- Dispel Magic
+			AddSpell(527)		-- Purify		
+			AddSpell(139)		-- Renew
+			AddSpell(2061)		-- Flash Heal
+			AddSpell(2060)		-- Heal
+			AddSpell(32546)		-- Binding Heal
+			AddSpell(596)		-- Prayer of Healing
+			AddSpell(33076)		-- Prayer of Mending
+			AddSpell(200829)	-- Plea
+			AddSpell(186263)	-- Shadow Mend
+			AddSpell(34861)		-- Circle of Healing
+			AddSpell(17)		-- Power Word: Shield
+			AddSpell(152118)	-- Clarity of Will
+			AddSpell(47788)		-- Guardian Spirit
+			AddSpell(47540)		-- Penance
+			AddSpell(2050)     	-- Holy Word: Serenity		
+			AddSpell(121135)	-- Cascade (not sure if correct Cascade)
+			AddSpell(2006)		-- Resurrection (rez)
+			
+	
+			-- Priest Purify, retail version
+			CureName = SpellName(527)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureDisease = true,
+					CanCureMagic = true 
+				}
+			end			
+			
+			-- Priest Dispel Magic, retail version
+			CureName = SpellName(528)
+			if CureName then 
+				Cures[CureName] = {
+					CanCureMagic = true
+				}
+			end			
+		end
 		
 
-		
-		-- Priest Dispel Magic
-		Cures[SpellName(528)] = {
-			CanCureMagic = true
-		}
-		
-		-- Priest Purify
-		Cures[SpellName(527)] = { 
-			CanCureDisease = true,
-			CanCureMagic = true 
-		}
 	end
 
 	if (class == "SHAMAN") then
-		AddSpell(51886)		-- Cleanse Spirit	
-		AddSpell(77130)		-- Purify Spirit
-		AddSpell(8004)		-- Healing Surge
-		AddSpell(77472)     -- Healing Wave		
-		AddSpell(1064)		-- Chain Heal		
-		AddSpell(61295)		-- Riptide		
-		AddSpell(974)		-- Earth Shield
-		AddSpell(16188)		-- Nature's Swiftness
-		AddSpell(73685)		-- Unleash Life
-		AddSpell(2008)		-- Ancestral Spirit (rez)
-			
-		-- Shaman Cleanse Spirit
-		Cures[SpellName(51886)] = { 
-			CanCureCurse = true,
-		} 
 		
-		-- Shaman Purify Spirit
-		Cures[SpellName(77130)] = {
-			CanCureCurse = true,
-			CanCureMagic = true
-		}
+		if IsClassic then 
+			-- classic
+
+			-- Shaman Cure Poision, classic only
+			CureName = SpellName(526)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCurePoison = true,
+				}
+			end			
+
+			-- Shaman Cure Disease, classic only
+			CureName = SpellName(2870)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureDisease = true,
+				}
+			end			
+		else
+			-- retail
+			AddSpell(51886)		-- Cleanse Spirit	
+			AddSpell(77130)		-- Purify Spirit
+			AddSpell(8004)		-- Healing Surge
+			AddSpell(77472)     -- Healing Wave		
+			AddSpell(1064)		-- Chain Heal		
+			AddSpell(61295)		-- Riptide		
+			AddSpell(974)		-- Earth Shield
+			AddSpell(16188)		-- Nature's Swiftness
+			AddSpell(73685)		-- Unleash Life
+			AddSpell(2008)		-- Ancestral Spirit (rez)
+			
+			-- Shaman Cleanse Spirit
+			CureName = SpellName(51886)
+			if CureName then 
+				Cures[CureName] = { 
+					CanCureCurse = true,
+				} 
+			end
+			
+			-- Shaman Purify Spirit
+			CureName = SpellName(77130)
+			if CureName then
+				Cures[CureName] = {
+					CanCureCurse = true,
+					CanCureMagic = true
+				}
+			end
+		end
 	end
 
 	if (class == "PALADIN") then
-		AddSpell(19750) -- Flash of Light
-		AddSpell(20473) -- Holy Shock
-		AddSpell(633) 	-- Lay on Hands
-		AddSpell(4987) 	-- Cleanse
-		AddSpell(213644) -- Cleanse Toxins
-		AddSpell(1022)	-- Hand of Protection
-		AddSpell(1038)	-- Hand of Salvation
-		AddSpell(1044)	-- Hand of Freedom
-		AddSpell(53563)	-- Beacon of Light
-		AddSpell(200025) -- Beacon of Virtue
-		AddSpell(20925)	-- Sacred Shield
-		AddSpell(85673)	-- Word of Glory
-		AddSpell(82326) -- Holy Light
-		AddSpell(85222)	-- Light of Dawn
-		AddSpell(82327)	-- Holy Radiance
-		AddSpell(114163)	-- Eternal Flame
-		AddSpell(114039)	-- Hand of Purity
-		AddSpell(114165)	-- Holy Prism
-		AddSpell(114916)	-- Execution Sentence
-		AddSpell(7328)		-- Redemption (rez)
-		AddSpell(183998) 	-- Light of the Martyr
+		if IsClassic then 
+			-- Classic
+			
+			-- Paladin Purify -- classic only
+			CureName = SpellName(1152)
+			if CureName then 
+				Cures[CureName] = {
+					CanCurePoison = true, 
+					CanCureDisease = true,		
+				}		
+			end
+			
+		else
+			-- Retail
+			
+			AddSpell(19750) -- Flash of Light
+			AddSpell(20473) -- Holy Shock
+			AddSpell(633) 	-- Lay on Hands
+			AddSpell(4987) 	-- Cleanse
+			AddSpell(213644) -- Cleanse Toxins
+			AddSpell(1022)	-- Hand of Protection
+			AddSpell(1038)	-- Hand of Salvation
+			AddSpell(1044)	-- Hand of Freedom
+			AddSpell(53563)	-- Beacon of Light
+			AddSpell(200025) -- Beacon of Virtue
+			AddSpell(20925)	-- Sacred Shield
+			AddSpell(85673)	-- Word of Glory
+			AddSpell(82326) -- Holy Light
+			AddSpell(85222)	-- Light of Dawn
+			AddSpell(82327)	-- Holy Radiance
+			AddSpell(114163)	-- Eternal Flame
+			AddSpell(114039)	-- Hand of Purity
+			AddSpell(114165)	-- Holy Prism
+			AddSpell(114916)	-- Execution Sentence
+			AddSpell(7328)		-- Redemption (rez)
+			AddSpell(183998) 	-- Light of the Martyr
+			
+			-- Paladin Cleanse Toxins
+			CureName = SpellName(213644)
+			if CureName then 
+				Cures[CureName] = {
+					CanCurePoison = true, 
+					CanCureDisease = true,		
+				}		
+			end
 		
-		-- Paladin Cleanse
-		Cures[SpellName(4987)] = {	
-			CanCurePoison = true, 
-			CanCureDisease = true,
-			CanCureMagic = true
-		}
+		end
 		
-		-- Paladin Cleanse Toxins
-		Cures[SpellName(213644)] = {
-			CanCurePoison = true, 
-			CanCureDisease = true,		
-		}		
-		
+		-- Paladin Cleanse -- classic and retail
+		CureName = SpellName(4987)
+		if CureName then 
+			Cures[CureName] = {	
+				CanCurePoison = true, 
+				CanCureDisease = true,
+				CanCureMagic = true
+			}
+		end
 	end
 	
-	if (class == "MONK") then
-		AddSpell(116694) 	-- Surging Mist
-		AddSpell(115175)	-- Soothing Mist
-		AddSpell(115151)	-- Renewing Mist
-		AddSpell(116849)	-- Life Cocoon
-		AddSpell(124682) 	-- Enveloping Mist
---		AddSpell(115310)	-- Revival (has cures, but is AOE)
-		AddSpell(116670)	-- Vivify
-		AddSpell(115450)	-- Detox (MW)
-		AddSpell(218164)	-- Detox (BrM/WW)
-		AddSpell(115178)	-- Resuscitate (rez)
-		AddSpell(124081)	-- zen pulse
-		AddSpell(197945)	-- mistwalk
-		
-		-- Monk Detox BrM/WW
-		Cures[SpellName(218164)] = {
-			CanCurePoison = true, 
-			CanCureDisease = true,
-		}
-		
-		-- Monk Detox MW
-		Cures[SpellName(115450)] = {
-			CanCurePoison = true, 
-			CanCureDisease = true,
-			CanCureMagic = true,
-			CanCureMagicFunc = function() return (GetSpecialization() == 2) end	-- if monk is mistweaver then Detox cures magic
-		}
-		
-		
+	if (class == "MAGE") then
+		if IsClassic then 
+			-- Mage Remove Lesser Curse -- classic only
+			CureName = SpellName(475)
+			if CureName then 
+				Cures[CureName] = {	
+					CanCureCurse = true, 
+				}
+			end
+		end
 	end
+	
+	if not IsClassic then 	
+		if (class == "MONK") then
+			AddSpell(116694) 	-- Surging Mist
+			AddSpell(115175)	-- Soothing Mist
+			AddSpell(115151)	-- Renewing Mist
+			AddSpell(116849)	-- Life Cocoon
+			AddSpell(124682) 	-- Enveloping Mist
+	--		AddSpell(115310)	-- Revival (has cures, but is AOE)
+			AddSpell(116670)	-- Vivify
+			AddSpell(115450)	-- Detox 		
+			AddSpell(115178)	-- Resuscitate (rez)
+			AddSpell(124081)	-- zen pulse
+			AddSpell(197945)	-- mistwalk
+			
+			-- Monk Detox
+			CureName = SpellName(115450)
+			if CureName then 
+				Cures[CureName] = {
+					CanCurePoison = true, 
+					CanCureDisease = true,
+					CanCureMagicFunc = function() return (GetSpecialization() == 2) end	-- if monk is mistweaver then Detox cures magic
+				}
+			end
+		end
 
-	if (class == "DEATHKNIGHT") then
-		AddSpell(61999) 		-- Raise Ally (battle rez)
-	end
-	
-	if (race == "Draenei") then -- race isn't in all uppercase like class
-		AddSpell(59547)		-- Gift of the Naaru
+		if (class == "DEATHKNIGHT") then
+			AddSpell(61999) 		-- Raise Ally (battle rez)
+		end
+		
+		if (race == "Draenei") then -- race isn't in all uppercase like class
+			AddSpell(59547)		-- Gift of the Naaru
+		end
 	end
 	
 	CuresCount = Count(Cures)

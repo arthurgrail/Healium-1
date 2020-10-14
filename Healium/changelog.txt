@@ -1,5 +1,41 @@
+2.7.2 CLASSIC
+* Updated ToC version number to 11303
+
+2.7.1 RETAIL
+* This release is the first public release that also includes source changes from the classic version. Going forward there will be a single source for both classic and retail mod versions. The sole exception being the TOC file will differ between the two, as this is unavoidable as best as I can tell.
+* Updated ToC version number to 80205
+* Fix "No Spell" menu always being checked. This issue was never released since it was an issue with in the classic source.
+
+2.7.0 CLASSIC
+* Due to the structural changes in this update you should re-add any spells that you want to use to Healium by drag and dropping from the spellbook (see below) and also reselect your debuff sound.
+* Removed button configuration from the Healium Configuration Panel and from the Configure Buttons menu. Use Drag and drop from the spellbook onto buttons to configure Healium spells, in Classic from now on.
+* Buttons will remember and use the specific rank of the spell when drag and dropped from the spellbook
+* Fixed always showing tooltips of the lowest rank of spell
+* Spell ranks are shown near the bottom of button tooltips, if tooltips are enabled
+* Fix debuff sounds not playing
+* Removed debuff sounds that don't exist in classic
+
+2.6.4 CLASSIC
+* Added Shaman Healing Wave (classic version) to the default list of spells
+* Fixed incoming heal bar being visible on some frames
+
+2.6.3 CLASSIC 
+* Fix LUA errors caused by cures that don't exist in classic
+* Added Paladin Holy Light (classic version) to the default list of spells
+* Removed options to show roles, incoming heals, and threat since classic doesn't support these at all
+
+2.6.2 CLASSIC
+* First release supporting WoW Classic
+
+2.6.1
+* Fix not displaying unit frames after first logging in.
+* Fix LUA errors for priests when Power World: Shield was used on a button
+
+2.6.0
+* Updated for Battle for Azeroth 
+
 2.5.9
-* Fix bugs with PlaySound caused by Blizzard api changes in this patch.
+* Fix bugs with PlaySound caused by Blizzard api changes in this patch
 
 2.5.8
 * Updated ToC version number to 70300 for wow 7.3 patch
@@ -16,7 +52,7 @@
  * Added Zen Pulse to the default spell list
  * Added Vivify to the default spell list
  * Added MistWalk to the default spell list
- * Fixed not updating cure states when switching specs.  A result of not dong this was that Monk Detox could improperly show up as curable or not after switching specs.
+ * Fixed not updating cure states when switching specs.  A result of not doing this was that Monk Detox could improperly show up as curable or not after switching specs
 
 2.5.4
 * Druid: Swiftmend is no longer darkened based on if Rejuvination or Regrowth is on the target
@@ -25,8 +61,8 @@
 * Fix LUA errors when on a Paladin, with Cleanse assigned to a button, and party member gets a magic debuf
 
 2.5.2
-* Mage: Removed "Remove Curse" from default spell list, which fixed some LUA errors when playing as a mage.  
-* Paladin: Workaround for "Beacon of Virtue" not allowing drag and drop onto a Healium button. 
+* Mage: Removed "Remove Curse" from default spell list, which fixed some LUA errors when playing as a mage
+* Paladin: Workaround for "Beacon of Virtue" not allowing drag and drop onto a Healium button
 * Added these spells to the default list of spells:
  * Paladin: Cleanse Toxins
  * Paladin: Beacon of Virtue
@@ -47,7 +83,7 @@
 * Added "Clarity of Will" spell to default list of priest spells
 
 2.4.0
-* Added Healers and Damagers Frames.  These frames shows the players in the raid or party matching the Healers or Damagers roles.
+* Added Healers and Damagers Frames.  These frames shows the players in the raid or party matching the Healers or Damagers roles
 * Tanks frame now uses Tank role.
 
 2.3.2
@@ -58,7 +94,7 @@
 * Paladin "Eternal Flame" will show up as a buff on a player now
 
 2.3.0
-* Replaced all use of Blizzard's drop down menu system with the NoTaint UIDropDownMenu library to remove taint.
+* Replaced all use of Blizzard's drop down menu system with the NoTaint UIDropDownMenu library to remove taint
 
 2.2.2
 * Fixed debuff warning sounds not being played after wow 6.1 patch

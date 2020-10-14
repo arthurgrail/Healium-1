@@ -222,11 +222,8 @@
 				</Backdrop>
 				<Scripts>
 					<OnLoad>
-						<!--SetBackdropBorderColor() and SetBackdropColor no longer supported by addon API-->
-						<!--
-							self:SetBackdropBorderColor(TOOLTIP_DEFAULT_COLOR.r, TOOLTIP_DEFAULT_COLOR.g, TOOLTIP_DEFAULT_COLOR.b);
-							self:SetBackdropColor(TOOLTIP_DEFAULT_BACKGROUND_COLOR.r, TOOLTIP_DEFAULT_BACKGROUND_COLOR.g, TOOLTIP_DEFAULT_BACKGROUND_COLOR.b);
-						-->
+						--self:SetBackdropBorderColor(0, 0, 0);
+						--self:SetBackdropColor(0,0,0);
 					</OnLoad>
 				</Scripts>
 			</Frame>

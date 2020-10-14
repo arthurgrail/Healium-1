@@ -1,3 +1,5 @@
+local IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+
 local function ShowPartyFrame()
 	Healium_ShowHidePartyFrame(true)
 end
@@ -69,6 +71,7 @@ local function RotateButtonsLeft(info, btnIndex)
 	local leftName = Profile.SpellNames[1]
 	local leftIcon = Profile.SpellIcons[1]
 	local leftType = Profile.SpellTypes[1]
+	local leftRank = Profile.SpellRanks[1]
 	local leftID = Profile.IDs[1]
 
 	local startIndex = btnIndex or 1
@@ -77,6 +80,7 @@ local function RotateButtonsLeft(info, btnIndex)
 		Profile.SpellNames[i] = Profile.SpellNames[i+1]
 		Profile.SpellIcons[i] = Profile.SpellIcons[i+1] 
 		Profile.SpellTypes[i] = Profile.SpellTypes[i+1]
+		Profile.SpellRanks[i] = Profile.SpellRanks[i+1]
 		Profile.IDs[i] = Profile.IDs[i+1] 
     end
 
@@ -84,6 +88,7 @@ local function RotateButtonsLeft(info, btnIndex)
 		Profile.SpellNames[Profile.ButtonCount] = leftName
 		Profile.SpellIcons[Profile.ButtonCount] = leftIcon
 		Profile.SpellTypes[Profile.ButtonCount] = leftType
+		Profile.SpellRanks[Profile.ButtonCount] = leftRank
 		Profile.IDs[Profile.ButtonCount] = leftID
 		
 		-- in the case we supply a button index, callers will update		
@@ -102,6 +107,7 @@ local function RotateButtonsRight(info, btnIndex)
 	local rightName = Profile.SpellNames[Profile.ButtonCount]
 	local rightIcon = Profile.SpellIcons[Profile.ButtonCount]
 	local rightType = Profile.SpellTypes[Profile.ButtonCount]
+	local rightRank = Profile.SpellRanks[Profile.ButtonCount]
 	local rightID = Profile.IDs[Profile.ButtonCount]
 	
 	local stopIndex = btnIndex or 2
@@ -110,6 +116,7 @@ local function RotateButtonsRight(info, btnIndex)
 		Profile.SpellNames[i] = Profile.SpellNames[i-1]
 		Profile.SpellIcons[i] = Profile.SpellIcons[i-1] 
 		Profile.SpellTypes[i] = Profile.SpellTypes[i-1]
+		Profile.SpellRanks[i] = Profile.SpellRanks[i-1]
 		Profile.IDs[i] = Profile.IDs[i-1] 
     end
 
@@ -117,6 +124,7 @@ local function RotateButtonsRight(info, btnIndex)
 		Profile.SpellNames[1] = rightName
 		Profile.SpellIcons[1] = rightIcon
 		Profile.SpellTypes[1] = rightType
+		Profile.SpellRanks[1] = rightRank
 		Profile.IDs[1] = rightID
 
 		-- in the case we supply a button index, callers will update		
@@ -142,6 +150,7 @@ local function InsertButton(info, btnIndex)
 	Profile.SpellNames[btnIndex] = nil
 	Profile.SpellIcons[btnIndex] = nil
 	Profile.SpellTypes[btnIndex] = nil
+	Profile.SpellRanks[btnIndex] = nil
 	Profile.IDs[btnIndex] = nil
 	
 	Healium_Update_ConfigPanel()	
@@ -307,7 +316,7 @@ local function HealiumMenu_InitializeDropDown(frame,level)
 --			menuItem.disabled = nil
 		table.insert(sbc, menuItem)
 
-		-- configure Configure Buttons		
+		-- configure Configure Buttons	
 		if i > 0 and i <= Profile.ButtonCount then
 			local btnMenuItem = { }
 			btnMenuItem.text = "Button " .. i
@@ -347,51 +356,63 @@ local function HealiumMenu_InitializeDropDown(frame,level)
 		{-- Title
 			text = Healium_AddonColor .. Healium_AddonName .. "|r Button " .. index,
 			isTitle = 1,
+			notCheckable = 1
 		}
 	}
-	
+
 	local currentSpell = Profile.SpellNames[index]
 	
-	for k, v in ipairs (Healium_Spell.Name) do
-		local spellmenuItem = { }
-		spellmenuItem.text = Healium_Spell.Name[k]
-		spellmenuItem.func = SetCurrentSpell
-		spellmenuItem.icon = Healium_Spell.Icon[k]
-		spellmenuItem.checked = currentSpell == Healium_Spell.Name[k]
-		spellmenuItem.arg1 = index
-		spellmenuItem.arg2 = k
-		
-		if (spellmenuItem.icon) then
-			table.insert(spells, spellmenuItem)
+	if not IsClassic then 
+		for k, v in ipairs (Healium_Spell.Name) do
+			local spellmenuItem = { }
+			spellmenuItem.text = Healium_Spell.Name[k]
+			spellmenuItem.func = SetCurrentSpell
+			spellmenuItem.icon = Healium_Spell.Icon[k]
+			spellmenuItem.checked = currentSpell == Healium_Spell.Name[k]
+			spellmenuItem.arg1 = index
+			spellmenuItem.arg2 = k
+			
+			if (spellmenuItem.icon) then
+				table.insert(spells, spellmenuItem)
+			end
 		end
 	end
 
 	-- Add No Spell, Insert Button, and Delete Button
-	cmds = 
-	{
+	cmds = {}
+	
+	if not IsClassic then 
+		local noSpell = 
 		{
 			text = "No Spell",
 			func = SetCurrentSpell,
 			checked = currentSpell == nil,
 			arg1 = index,
-		},
-		{
-			text = "Insert Button",
-			notCheckable = 1,
-			func = InsertButton,
-			arg1 = index
-		},
-		{
-			text = "Delete Button",
-			notCheckable = 1,
-			func = DeleteButton,
-			arg1 = index
-		}	
+		}
+		table.insert(cmds, noSpell)
+	end
+		
+	local insert = 
+	{
+		text = "Insert Button",
+		notCheckable = 1,
+		func = InsertButton,
+		arg1 = index
 	}
+	table.insert(cmds, insert)
+	
+	local delete = 
+	{
+		text = "Delete Button",
+		notCheckable = 1,
+		func = DeleteButton,
+		arg1 = index
+	}	
+	table.insert(cmds, delete)
+
 	for k, v in ipairs (cmds) do
 		table.insert(spells, v)
 	end		
-	
 	
 	MenuTable[3][index] = spells
 

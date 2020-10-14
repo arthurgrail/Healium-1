@@ -1,3 +1,5 @@
+local IsClassic = _G.WOW_PROJECT_ID == _G.WOW_PROJECT_CLASSIC
+
 local function CreateDropDownMenu(name,parent,x,y)
   local f = CreateFrame("Frame", name, parent, "Lib_UIDropDownMenuTemplate") 
   f:SetPoint("TOPLEFT", parent, "TOPLEFT",x,y)
@@ -22,7 +24,7 @@ local function DropDownMenuItem_OnClick(dropdownbutton)
 		if (dropdownbutton.owner == HealiumDropDown[i]) then
 			for j=0, Healium_MaxClassSpells - 1, 1 do
 				if (dropdownbutton.value == j) then
-					Healium_SetProfileSpell(Profile, i, Healium_Spell.Name[j+1], Healium_Spell.ID[j+1], Healium_Spell.Icon[j+1])
+					Healium_SetProfileSpell(Profile, i, Healium_Spell.Name[j+1], Healium_Spell.ID[j+1], Healium_Spell.Icon[j+1], nil)
 				end
 			end
 		end
@@ -77,20 +79,20 @@ end
 local function SoundDropDownMenu_Init(frame, level)
 	level = level or 1  
 	local info = Lib_UIDropDownMenu_CreateInfo() 
-	
---	Lib_UIDropDownMenu_SetSelectedValue(frame , nil)
 	local sound = Lib_UIDropDownMenu_GetText(frame)
 	
 	for k, v in ipairs (Healium_Sounds) do
 		local this_sound = next(v, nil)
-		info.text = this_sound
-		info.value = this_sound
-		info.func = SoundDropDownMenuItem_OnClick
-		info.owner = frame
-		info.checked = nil 
-		Lib_UIDropDownMenu_AddButton(info, level) 
-		if this_sound == sound then
-			Lib_UIDropDownMenu_SetSelectedValue(frame, this_sound)	
+		if not IsClassic or not v[this_sound].retail then 
+			info.text = this_sound
+			info.value = this_sound
+			info.func = SoundDropDownMenuItem_OnClick
+			info.owner = frame
+			info.checked = nil 
+			Lib_UIDropDownMenu_AddButton(info, level) 
+			if this_sound == sound then
+				Lib_UIDropDownMenu_SetSelectedValue(frame, this_sound)	
+			end
 		end
 	end
 end
@@ -265,25 +267,26 @@ function Healium_Update_ConfigPanel()
 	
 	HealiumMaxButtonSlider:SetValue(Healium_GetProfile().ButtonCount)
 	
-	for i=1, Healium_MaxButtons, 1 do    
-		local name
-		if Profile.SpellTypes[i] == Healium_Type_Macro then 
-			name =  "Macro: " .. Profile.SpellNames[i]
-		elseif Profile.SpellTypes[i] == Healium_Type_Item then
-			name = "Item: " .. Profile.SpellNames[i]
-		else
-			name = Profile.SpellNames[i]
-			if name == nil then
-				name = "No Spell"
+	if not IsClassic then 
+		for i=1, Healium_MaxButtons, 1 do    
+			local name
+			if Profile.SpellTypes[i] == Healium_Type_Macro then 
+				name =  "Macro: " .. Profile.SpellNames[i]
+			elseif Profile.SpellTypes[i] == Healium_Type_Item then
+				name = "Item: " .. Profile.SpellNames[i]
+			else
+				name = Profile.SpellNames[i]
+				if name == nil then
+					name = "No Spell"
+				end
 			end
+		
+			Lib_UIDropDownMenu_SetText(HealiumDropDown[i], name)
 		end
-	
-		Lib_UIDropDownMenu_SetText(HealiumDropDown[i], name)
 	end
 end
 
 function Healium_CreateConfigPanel(Class, Version)
---	Healium_DebugPrint("Begin Healium_CreateAddonOptionFrame()")
 	local Profile = Healium_GetProfile()
 	
 	local panel = CreateFrame("Frame", nil, UIParent)
@@ -302,10 +305,17 @@ function Healium_CreateConfigPanel(Class, Version)
 	
     scrollframe.scrollbar = _G["HealiumPanelScrollFrameScrollBar"]   
     --scrollframe.scrollbar:SetBackdrop({   
+<<<<<<< Updated upstream
     --    edgeFile = "Interface/Tooltips/UI-Tooltip-Border",   
     --    edgeSize = 8,   
     --    tileSize = 32,   
     --    insets = { left = 0, right =0, top =5, bottom = 5 }})   
+=======
+     --   edgeFile = "Interface/Tooltips/UI-Tooltip-Border",   
+      --  edgeSize = 8,   
+       -- tileSize = 32,   
+        --insets = { left = 0, right =0, top =5, bottom = 5 }})   
+>>>>>>> Stashed changes
 	
 	
 	local scrollchild = CreateFrame("Frame", "$parentScrollChild", scrollframe)
@@ -387,50 +397,71 @@ function Healium_CreateConfigPanel(Class, Version)
 		"Allows use of the Clique addon on the healthbar.  Clique will override the ability to LeftClick to target the unit unless you configure Clique to do that, which it can.", "Enable Clique Support")		
 	EnableCliqueCheck:SetScript("OnClick", EnableCliqueCheck_OnClick)	
 	
-	-- Show Threat check button
-	local ShowThreatCheck = CreateCheck("$parentShowRoleCheckButton",scrollchild,EnableCliqueCheck,	"Shows a threat indicator that displays if the unit has threat on any mob.", "Show Threat")	
-	ShowThreatCheck:SetScript("OnClick", ShowThreatCheck_OnClick)	
+	local ShowThreatCheck
+	local ShowRoleCheck
+	local ShowIncomingHealsCheck
+	
+	if not IsClassic then
+		-- Show Threat check button
+		ShowThreatCheck = CreateCheck("$parentShowRoleCheckButton",scrollchild,EnableCliqueCheck,	"Shows a threat indicator that displays if the unit has threat on any mob.", "Show Threat")	
+		ShowThreatCheck:SetScript("OnClick", ShowThreatCheck_OnClick)	
 
-	-- Show Role check button
-	local ShowRoleCheck = CreateCheck("$parentShowRoleCheckButton",scrollchild,ShowThreatCheck,
-		"Shows unit's role icon (healer, tank, damage) when in random dungeons.  Will override Health Percentage text when unit is assigned a role.", "Show Role Icons")
-	ShowRoleCheck:SetScript("OnClick", ShowRoleCheck_OnClick)	
+		-- Show Role check button
+		ShowRoleCheck = CreateCheck("$parentShowRoleCheckButton",scrollchild,ShowThreatCheck,
+			"Shows unit's role icon (healer, tank, damage) when in random dungeons.  Will override Health Percentage text when unit is assigned a role.", "Show Role Icons")
+		ShowRoleCheck:SetScript("OnClick", ShowRoleCheck_OnClick)	
 
-	-- Show Incoming Heals check button
-	local ShowIncomingHealsCheck = CreateCheck("$parentShowIncomingHealsCheckButton",scrollchild,ShowRoleCheck,
-		"Shows incoming heals from all units as a dark green bar extending beyond the unit's current health.", "Show Incoming Heals")
-	ShowIncomingHealsCheck:SetScript("OnClick", ShowIncomingHealsCheck_OnClick)	
+		-- Show Incoming Heals check button
+		ShowIncomingHealsCheck = CreateCheck("$parentShowIncomingHealsCheckButton",scrollchild,ShowRoleCheck,
+			"Shows incoming heals from all units as a dark green bar extending beyond the unit's current health.", "Show Incoming Heals")
+		ShowIncomingHealsCheck:SetScript("OnClick", ShowIncomingHealsCheck_OnClick)	
+	end
 	
 	-- Show Raid Icons check button
-	local ShowRaidIconsCheck = CreateCheck("$parentShowRaidIconsCheckButton",scrollchild,ShowIncomingHealsCheck, "Shows the raid icon assigned to this unit.", "Show Raid Icons")
+	local ShowRaidParent
+	if IsClassic then 
+		ShowRaidParent = EnableCliqueCheck
+	else
+		ShowRaidParent = ShowIncomingHealsCheck
+	end
+	
+	local ShowRaidIconsCheck = CreateCheck("$parentShowRaidIconsCheckButton",scrollchild,ShowRaidParent, "Shows the raid icon assigned to this unit.", "Show Raid Icons")
 	ShowRaidIconsCheck:SetScript("OnClick", ShowRaidIconsCheck_OnClick)	
 	
-	-- Uppercase ames check button
+	-- Uppercase names check button
 	local UppercaseNamesCheck = CreateCheck("$parentShowUppercaseNamesCheckButton",scrollchild,ShowRaidIconsCheck, "Shows names in UPPERCASE text.", "UPPERCASE names")
 	UppercaseNamesCheck:SetScript("OnClick", UppercaseNamesCheck_OnClick)
+	local ClassicConfigButtonsText
+	
+	if not IsClassic then		
+		-- Dropdown menus
+		local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
+		ButtonConfigTitleText:SetJustifyH("LEFT")
+		ButtonConfigTitleText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -20)
+		ButtonConfigTitleText:SetText("Button Configuration")	
 		
-	-- Dropdown menus
-	local ButtonConfigTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
-	ButtonConfigTitleText:SetJustifyH("LEFT")
-	ButtonConfigTitleText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -20)
-	ButtonConfigTitleText:SetText("Button Configuration")	
-	
-	local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
-	ButtonConfigTitleSubText:SetJustifyH("LEFT")
-	ButtonConfigTitleSubText:SetPoint("TOPLEFT", ButtonConfigTitleText, "BOTTOMLEFT", 0, 0)
-	ButtonConfigTitleSubText:SetText("Click the dropdowns to configure each button.|nYou may now drag and drop directly from the spellbook|nonto buttons to configure them, including buffs!")
-	ButtonConfigTitleSubText:SetTextColor(1,1,1,1) 	
-	
-	local y = -480
-	local y_inc = 20
-	
-	for i=1, Healium_MaxButtons, 1 do
-		HealiumDropDown[i] = CreateDropDownMenu("HealiumDropDown[" .. i .. "]",scrollchild,60,y)
-		y = y - y_inc
-		HealiumDropDown[i].Text:SetText("Button " .. i)
---		HealiumDropDown[i].tooltipText = Healium_AddonColoredName .. " button"
-	end
+		local ButtonConfigTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
+		ButtonConfigTitleSubText:SetJustifyH("LEFT")
+		ButtonConfigTitleSubText:SetPoint("TOPLEFT", ButtonConfigTitleText, "BOTTOMLEFT", 0, 0)
+		ButtonConfigTitleSubText:SetText("Click the dropdowns to configure each button.|nYou may now drag and drop directly from the spellbook|nonto buttons to configure them, including buffs!")
+		ButtonConfigTitleSubText:SetTextColor(1,1,1,1) 	
 
+		local y = -480
+		local y_inc = 20
+		
+		for i=1, Healium_MaxButtons, 1 do
+			HealiumDropDown[i] = CreateDropDownMenu("HealiumDropDown[" .. i .. "]",scrollchild,60,y)
+			y = y - y_inc
+			HealiumDropDown[i].Text:SetText("Button " .. i)
+	--		HealiumDropDown[i].tooltipText = Healium_AddonColoredName .. " button"
+		end
+	else
+		ClassicConfigButtonsText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
+		ClassicConfigButtonsText:SetJustifyH("LEFT")
+		ClassicConfigButtonsText:SetPoint("TOPLEFT", UppercaseNamesCheck, "BOTTOMLEFT", 0, -30)
+		ClassicConfigButtonsText:SetText("In Classic, to configure buttons, drag and drop directly from the spellbook onto buttons.")
+		ClassicConfigButtonsText:SetTextColor(1,1,1,1) 	
+	end
 
 	-- Slider for controlling how many buttons to show
     HealiumMaxButtonSlider = CreateFrame("Slider","$parentMaxButtonSlider",scrollchild,"OptionsSliderTemplate")
@@ -479,7 +510,12 @@ function Healium_CreateConfigPanel(Class, Version)
 	-- Show Frames Settings
 	local ShowFramesTitleText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalLarge")
 	ShowFramesTitleText:SetJustifyH("LEFT")
-	ShowFramesTitleText:SetPoint("TOPLEFT", HealiumDropDown[Healium_MaxButtons].Text, "BOTTOMLEFT", 0, -30)
+	local ShowFramesParent
+	if IsClassic then 
+		ShowFramesTitleText:SetPoint("TOPLEFT", ClassicConfigButtonsText, "BOTTOMLEFT", 0, -30)
+	else
+		ShowFramesTitleText:SetPoint("TOPLEFT", HealiumDropDown[Healium_MaxButtons].Text, "BOTTOMLEFT", 0, -30)
+	end
 	ShowFramesTitleText:SetText("Show Frames")	
 	
 	local ShowFramesTitleSubText = scrollchild:CreateFontString(nil, "OVERLAY","GameFontNormalSmall")
@@ -526,7 +562,7 @@ function Healium_CreateConfigPanel(Class, Version)
     end)	
 	
 	-- Show Target Check
-	Healium_ShowTargetCheck = CreateCheck("$parentShowFocusCheckButton",scrollchild,Healium_ShowFriendsCheck, "Shows the Target " .. Healium_AddonColoredName .. " frame.", "Target")
+	Healium_ShowTargetCheck = CreateCheck("$parentShowTargetCheckButton",scrollchild,Healium_ShowFriendsCheck, "Shows the Target " .. Healium_AddonColoredName .. " frame.", "Target")
     
     Healium_ShowTargetCheck:SetScript("OnClick",function()
         Healium.ShowTargetFrame = Healium_ShowTargetCheck:GetChecked() or false
@@ -534,15 +570,24 @@ function Healium_CreateConfigPanel(Class, Version)
     end)		
 	
 	-- Show Focus Check
-	Healium_ShowFocusCheck = CreateCheck("$parentShowFocusCheckButton",scrollchild,Healium_ShowTargetCheck, "Shows the Focus " .. Healium_AddonColoredName .. " frame.", "Focus")
-    
-    Healium_ShowFocusCheck:SetScript("OnClick",function()
-        Healium.ShowFocusFrame = Healium_ShowFocusCheck:GetChecked() or false
-		Healium_ShowHideFocusFrame()
-    end)		
+	if not IsClassic then 
+		Healium_ShowFocusCheck = CreateCheck("$parentShowFocusCheckButton",scrollchild,Healium_ShowTargetCheck, "Shows the Focus " .. Healium_AddonColoredName .. " frame.", "Focus")
+		
+		Healium_ShowFocusCheck:SetScript("OnClick",function()
+			Healium.ShowFocusFrame = Healium_ShowFocusCheck:GetChecked() or false
+			Healium_ShowHideFocusFrame()
+		end)		
+	end
 	
 	-- Show Group 1 Check
-	Healium_ShowGroup1Check = CreateCheck("$parentShowGroup1CheckButton",scrollchild,Healium_ShowFocusCheck, "Shows the Group 1 " .. Healium_AddonColoredName .. " frame.", "Group 1")
+	local Group1Parent
+	if IsClassic then 
+		Group1Parent = Healium_ShowTargetCheck
+	else
+		Group1Parent = Healium_ShowFocusCheck
+	end
+	
+	Healium_ShowGroup1Check = CreateCheck("$parentShowGroup1CheckButton",scrollchild,Group1Parent, "Shows the Group 1 " .. Healium_AddonColoredName .. " frame.", "Group 1")
     
     Healium_ShowGroup1Check:SetScript("OnClick",function()
         Healium.ShowGroupFrames[1] = Healium_ShowGroup1Check:GetChecked() or false
@@ -769,7 +814,7 @@ function Healium_CreateConfigPanel(Class, Version)
     RangeCheckSlider:SetValue(1.0/Healium.RangeCheckPeriod)
     
     RangeCheckSlider:SetPoint("TOPLEFT", RangeCheckCheck.Text, "TOPRIGHT", 15, 0)
-    RangeCheckSlider.tooltipText = "Controls how often to do range cheks.  The further to the right, the more often range checks are performed and the more CPU it will use."
+    RangeCheckSlider.tooltipText = "Controls how often to do range checks.  The further to the right, the more often range checks are performed and the more CPU it will use."
 	
     RangeCheckSlider.Text = RangeCheckSlider:CreateFontString(nil, "BACKGROUND","GameFontNormalSmall")
     RangeCheckSlider.Text:SetPoint("CENTER", -5, 17)
@@ -802,6 +847,10 @@ function Healium_CreateConfigPanel(Class, Version)
     AboutFrame:SetHeight(80)
     AboutFrame:SetPoint("TOPLEFT", AboutTitle.Text, "BOTTOMLEFT", 0, 0)
 
+<<<<<<< Updated upstream
+=======
+	-- Background color setting is broken?
+>>>>>>> Stashed changes
     --AboutFrame:SetBackdrop({bgFile = "",
     --edgeFile = "Interface/Tooltips/UI-Tooltip-Border", 
     --tile = true, tileSize = 16, edgeSize = 16,
@@ -814,8 +863,10 @@ function Healium_CreateConfigPanel(Class, Version)
     AboutFrame.Text:SetText(Healium_AddonColoredName .. Version .. " |cFFFFFFFFCreated by Engee of Durotan.|n|n|cFFFFFFFFOriginally based on FB Heal Box, which was created by Dourd of Argent Dawn EU.")
 
 	-- Init Config Panel controls
-	for i=1, Healium_MaxButtons, 1 do
-		Lib_UIDropDownMenu_Initialize(HealiumDropDown[i], DropDownMenu_Init)
+	if not IsClassic then 
+		for i=1, Healium_MaxButtons, 1 do
+			Lib_UIDropDownMenu_Initialize(HealiumDropDown[i], DropDownMenu_Init)
+		end
 	end
 	
 	Healium_Update_ConfigPanel()
@@ -832,9 +883,15 @@ function Healium_CreateConfigPanel(Class, Version)
 	LockFramePositionsCheck:SetChecked(Healium.LockFrames)
 	EnableDebuffsCheck:SetChecked(Healium.EnableDebufs)
 	EnableCliqueCheck:SetChecked(Healium.EnableClique)
-	ShowThreatCheck:SetChecked(Healium.ShowThreat)
-	ShowRoleCheck:SetChecked(Healium.ShowRole)
-	ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
+			
+			
+	if not IsClassic then 
+		ShowThreatCheck:SetChecked(Healium.ShowThreat)
+		ShowRoleCheck:SetChecked(Healium.ShowRole)
+		ShowIncomingHealsCheck:SetChecked(Healium.ShowIncomingHeals)
+		Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)		
+	end
+	
 	ShowRaidIconsCheck:SetChecked(Healium.ShowRaidIcons)
 	UppercaseNamesCheck:SetChecked(Healium.UppercaseNames)
 	EnableDebuffAudioCheck:SetChecked(Healium.EnableDebufAudio)
@@ -854,7 +911,6 @@ function Healium_CreateConfigPanel(Class, Version)
 	Healium_ShowHealersCheck:SetChecked(Healium.ShowHealersFrame)		
 	Healium_ShowTanksCheck:SetChecked(Healium.ShowTanksFrame)
 	Healium_ShowTargetCheck:SetChecked(Healium.ShowTargetFrame)
-	Healium_ShowFocusCheck:SetChecked(Healium.ShowFocusFrame)
 	Healium_ShowGroup1Check:SetChecked(Healium.ShowGroupFrames[1])
 	Healium_ShowGroup2Check:SetChecked(Healium.ShowGroupFrames[2])
 	Healium_ShowGroup3Check:SetChecked(Healium.ShowGroupFrames[3])
