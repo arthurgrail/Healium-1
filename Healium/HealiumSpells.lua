@@ -287,8 +287,7 @@ function Healium_ShowDebuffButtons(Profile, frame, debuffTypes)
 			local curseBar = button.CurseBar
 			
 			if flag then
-				-- SetBackdropBorderColor no longer supported by API
-				-- curseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
+				curseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 				curseBar:SetAlpha(1)
 				curseBar.hasDebuf = true
 			else
