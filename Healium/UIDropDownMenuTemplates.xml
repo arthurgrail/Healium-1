@@ -193,7 +193,7 @@
 		<DisabledFont style="GameFontDisableSmallLeft"/>
 	</Button>
 	
-	<Button name="Lib_UIDropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true" inherits="BackdropTemplate">
+	<Button name="Lib_UIDropDownListTemplate" hidden="true" frameStrata="DIALOG" enableMouse="true" virtual="true">
 		<Frames>
 			<Frame name="$parentBackdrop" setAllPoints="true" inherits="BackdropTemplate">
 				<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background-Dark" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
