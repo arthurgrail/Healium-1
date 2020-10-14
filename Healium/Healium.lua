@@ -410,7 +410,8 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 
 	if status and status > 1 then 
 		local r, g, b = GetThreatStatusColor(status)
-		NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
+		-- SetBackdropBorderColor no longer supported by API
+		-- NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
 		NamePlate.AggroBar:SetAlpha(1)
 	else
 		NamePlate.AggroBar:SetAlpha(0)

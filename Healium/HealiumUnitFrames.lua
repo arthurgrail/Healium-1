@@ -995,7 +995,8 @@ function Healium_UpdateUnitBuffs(unit, frame)
 					frame.debuffColor = debuffColor
 					
 					if Healium.EnableDebufHealthbarHighlighting then
-						frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
+						-- SetBackdropBorderColor no longer supported by API
+						-- frame.CurseBar:SetBackdropBorderColor(debuffColor.r, debuffColor.g, debuffColor.b)
 						frame.CurseBar:SetAlpha(1)
 					end	
 					
