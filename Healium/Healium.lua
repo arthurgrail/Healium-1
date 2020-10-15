@@ -404,6 +404,13 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 	if not NamePlate.AggroBar.Backdrop then
 		NamePlate.AggroBar.Backdrop = CreateFrame("Frame", name.."Backdrop", frame, "BackdropTemplate")
 		NamePlate.AggroBar.Backdrop:SetAllPoints()
+		NamePlate.AggroBar.Backdrop.backdropInfo = {
+			edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+			tile = true,
+			edgeSize = 12,
+			insets = { left = 0, right = 0, top = 0, bottom = 0 },
+		}
+		NamePlate.AggroBar.Backdrop:SetBackdrop(NamePlate.AggroBar.Backdrop.backdropInfo)
 	end
 
 	if Healium.ShowThreat == nil then
@@ -431,6 +438,18 @@ function Healium_UpdateShowThreat()
 
 	for _, k in ipairs(Healium_Frames) do
 		if (k.TargetUnit) then
+			if not k.AggroBar.Backdrop then
+				k.AggroBar.Backdrop = CreateFrame("Frame", name.."Backdrop", frame, "BackdropTemplate")
+				k.AggroBar.Backdrop:SetAllPoints()
+				k.AggroBar.Backdrop.backdropInfo = {
+					edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border",
+					tile = true,
+					edgeSize = 12,
+					insets = { left = 0, right = 0, top = 0, bottom = 0 },
+				}
+				k.AggroBar.Backdrop:SetBackdrop(k.AggroBar.backdropInfo)
+			end
+
 			if Healium.ShowThreat then	
 				Healium_UpdateUnitThreat(k.TargetUnit, k)
 			else
