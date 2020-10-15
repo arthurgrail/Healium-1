@@ -401,8 +401,13 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 	if not NamePlate then return end
 	if not UnitExists(unitName) then return end
 	
+	if not NamePlate.AggroBar.Backdrop then
+		NamePlate.AggroBar.Backdrop = CreateFrame("Frame", name.."Backdrop", frame, "BackdropTemplate")
+		NamePlate.AggroBar.Backdrop:SetAllPoints()
+	end
+
 	if Healium.ShowThreat == nil then
-		NamePlate.AggroBar:SetAlpha(0)	
+		NamePlate.AggroBar.Backdrop:SetAlpha(0)	
 		return
 	end
 	
@@ -410,11 +415,10 @@ function Healium_UpdateUnitThreat(unitName, NamePlate)
 
 	if status and status > 1 then 
 		local r, g, b = GetThreatStatusColor(status)
-		-- SetBackdropBorderColor no longer supported by API
-		-- NamePlate.AggroBar:SetBackdropBorderColor(r,g,b,1)
-		NamePlate.AggroBar:SetAlpha(1)
+		NamePlate.AggroBar.Backdrop:SetBackdropBorderColor(r,g,b,1)
+		NamePlate.AggroBar.Backdrop:SetAlpha(1)
 	else
-		NamePlate.AggroBar:SetAlpha(0)
+		NamePlate.AggroBar.Backdrop:SetAlpha(0)
 	end
 end
 
@@ -430,7 +434,7 @@ function Healium_UpdateShowThreat()
 			if Healium.ShowThreat then	
 				Healium_UpdateUnitThreat(k.TargetUnit, k)
 			else
-				k.AggroBar:SetAlpha(0)				
+				k.AggroBar.Backdrop:SetAlpha(0)				
 			end
 		end
 	end
